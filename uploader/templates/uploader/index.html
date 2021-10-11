@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {% load static %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css"
+          type="text/css">
+    <link rel="stylesheet" href="{% static 'uploader/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'uploader/css/theme.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'uploader/css/progress_bar.css' %}" type="text/css">
+        <link rel="stylesheet" href="{% static 'uploader/css/select_control.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'uploader/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'uploader/css/bootstrap-table.min.css' %}">
+    <link rel="stylesheet" href="{% static 'uploader/extensions/filter-control/bootstrap-table-filter-control.min.css' %}">
+        <link rel="stylesheet" href="{% static 'uploader/css/spin_icons.css' %}">
+    <script src="{% static 'uploader/js/jquery.min.js' %}"></script>
+    <script src="{% static 'uploader/js/popper.js' %}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.11/lodash.min.js"></script>
+    <title>Data Extractor</title>
+</head>
+
+<body>
+<div class="py-5">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <ul class="nav nav-tabs">
+                    <li class="nav-item"><a href="" class="active nav-link" data-toggle="tab" data-target="#tabone">Upload</a>
+                    </li>
+                    <li class="nav-item"><a class="nav-link" href="" data-toggle="tab" data-target="#tabtwo">Exploration<br></a>
+                    </li>
+                </ul>
+                <div class="tab-content mt-2">
+                    {% include "uploader/upload_tab.html" %}
+                    {% include "uploader/export_tab.html" %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="{% static 'uploader/js/bootstrap.min.js' %}"></script>
+<script src="{% static 'uploader/js/bootstrap-table.min.js' %}"></script>
+<script src="{% static 'uploader/js/refresh_list.js' %}"></script>
+<script src="{% static 'uploader/js/add_groups.js' %}"></script>
+<script src="{% static 'uploader/js/dropzone_upload.js' %}"></script>
+<script src="{% static 'uploader/js/bootstrap-table-auto-refresh.min.js' %}"></script>
+<script src="{% static 'uploader/extensions/filter-control/bootstrap-table-filter-control.min.js' %}"></script>
+</body>
+
+</html>
