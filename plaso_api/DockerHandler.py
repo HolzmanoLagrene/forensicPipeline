@@ -1,112 +1,61 @@
-import asyncio
 import os
-import threading
 
 import docker
+from docker.errors import APIError, ContainerError, ImageNotFound
 
-from . import api_settings
+from plaso_api import api_settings
 
 
-class DockerHandler:
-    def __init__(self):
-        self.client = docker.from_env()
+def __fix_folder_configuration(evidence_path):
+    if not os.path.isdir(os.path.join(evidence_path, "plaso")):
+        os.makedirs(os.path.join(evidence_path, "plaso"))
+    else:
+        pass
+    if not os.path.isdir(os.path.join(evidence_path, "logs")):
+        os.makedirs(os.path.join(evidence_path, "logs"))
+    else:
+        pass
 
-    @staticmethod
-    def __check_folder_configuration(evidence_name):
-        status = True
-        evidence_path = os.path.join(api_settings.DATA_PATH, evidence_name)
-        if os.path.isdir(evidence_path):
-            if os.path.isdir(os.path.join(evidence_path, "evidences")):
-                pass
-            else:
-                print(f"No such directory {os.path.isdir(os.path.join(evidence_path, 'evidences'))}. Exiting.")
-                status = False
-            if not os.path.isdir(os.path.join(evidence_path, "plaso")):
-                os.makedirs(os.path.join(evidence_path, "plaso"))
-            else:
-                pass
-            if not os.path.isdir(os.path.join(evidence_path, "logs")):
-                os.makedirs(os.path.join(evidence_path, "logs"))
-            else:
-                pass
-        else:
-            print(f"No such directory {evidence_path}. Exiting.")
-            status = False
-        return status
 
-    @staticmethod
-    def __print_logs_in_thread(container, evidence_name, type, verbose):
-        evidence_path = os.path.join(api_settings.DATA_PATH, evidence_name, "logs")
-        log_path = os.path.join(evidence_path, f"{type}_plaso_logs.log")
-        logs = container.logs(stream=True, follow=True)
-        try:
-            while True:
-                line = next(logs).decode("utf-8")
-                if verbose:
-                    print(line, end="")
-                with open(log_path, "a+") as out_:
-                    out_.write(line)
-        except StopIteration:
-            print(f'log stream ended for container {container.name}')
+def __print_logs(container, evidence_name, type, verbose):
+    evidence_path = os.path.join(api_settings.DATA_PATH, evidence_name, "logs")
+    log_path = os.path.join(evidence_path, f"{type}_plaso_logs.log")
+    logs = container.logs(stream=True, follow=True)
+    try:
+        while True:
+            line = next(logs).decode("utf-8")
+            if verbose:
+                print(line, end="")
+            with open(log_path, "a+") as out_:
+                out_.write(line)
+    except StopIteration:
+        print(f'log stream ended for container {container.name}')
 
-    def __print_logs(self, container, evidence_name, type, verbose, background=False):
-        if background:
-            thread = threading.Thread(target=self.__print_logs_in_thread, args=(container, evidence_name, type, verbose))
-            thread.daemon = True  # Daemonize thread
-            thread.start()
-        else:
-            self.__print_logs_in_thread(container, evidence_name, type, verbose)
 
-    def stop_process(self, evidence_name):
-        for container in self.client.containers.list():
-            if container.name.endswith(evidence_name):
-                container.stop()
+def stop_process(evidence_name):
+    for container in docker.from_env().containers.list():
+        if container.name.endswith(evidence_name):
+            container.stop()
 
-    async def run_log2timeline(self, evidence_name, verbose=False):
-        folder_config_ok = self.__check_folder_configuration(evidence_name)
-        if folder_config_ok:
-            evidence_path = os.path.join(api_settings.DATA_PATH, evidence_name)
-            container = self.client.containers.run(api_settings.PLASO_CONTAINER_NAME,
-                                                   f"log2timeline \
-                                                   --storage_file /data/plaso/storage.plaso\
-                                                    --logfile /data/logs/log2timeline.log \
-                                                    --status_view linear\
-                                                    -d \
-                                                    /data/evidences",
-                                                   auto_remove=True,
-                                                   detach=True,
-                                                   name="log2timeline" + "_" + evidence_name,
-                                                   volumes={evidence_path:
-                                                                {'bind': '/data', 'mode': 'rw'},
-                                                            }
-                                                   )
-            awaitable = asyncio.to_thread(container.wait)
-            result = await awaitable
-            return result['StatusCode']
 
-    async def run_pinfo(self, evidence_name, verbose=False):
-        evidence_path = os.path.join(api_settings.DATA_PATH, evidence_name)
-        container = self.client.containers.run(api_settings.PLASO_CONTAINER_NAME,
-                                               f"pinfo \
-                                                        -w /data/plaso/pinfo.json \
-                                                        -v \
-                                                        --output_format json \
-                                                        /data/plaso/storage.plaso",
-                                               auto_remove=True,
-                                               detach=True,
-                                               name="pinfo" + "_" + evidence_name,
-                                               volumes={evidence_path:
-                                                            {'bind': '/data', 'mode': 'rw'},
-                                                        }
-                                               )
-        awaitable = asyncio.to_thread(container.wait)
-        result = await awaitable
-        return result['StatusCode']
-
-    async def run_psort(self, evidence_name, verbose=False):
-        evidence_path = os.path.join(api_settings.DATA_PATH, evidence_name)
-        container = self.client.containers.run(api_settings.PLASO_CONTAINER_NAME,
-                                               f"psort \
+def run_docker_container(command, evidence_name):
+    evidence_path = os.path.join(api_settings.DATA_PATH, evidence_name)
+    if command == "log2timeline":
+        __fix_folder_configuration(evidence_path)
+        command_string = "log2timeline \
+                                     --storage_file /data/plaso/storage.plaso\
+                                     --logfile /data/logs/log2timeline.log \
+                                      --status_view linear\
+                                      -d \
+                                      /data/evidence"
+    elif command == "pinfo":
+        command_string = "pinfo \
+                                                          -w /data/plaso/pinfo.json \
+                                                          -v \
+                                                          --output_format json \
+                                                          /data/plaso/storage.plaso"
+    elif command == "psort":
+        command_string = f"psort \
                                                         -d \
                                                 --logfile /data/logs/psort.log \
                                                 -o elastic \
@@ -115,15 +64,58 @@ class DockerHandler:
                                                 --server {api_settings.elasticsearch_server}\
                                                 --port {api_settings.elasticsearch_port}\
                                                 --index_name plaso_{evidence_name}\
-                                                        /data/plaso/storage.plaso",
-                                               auto_remove=True,
-                                               detach=True,
-                                               network_mode="host",
-                                               name="psort" + "_" + evidence_name,
-                                               volumes={evidence_path:
-                                                            {'bind': '/data', 'mode': 'rw'},
-                                                        }
-                                               )
-        awaitable = asyncio.to_thread(container.wait)
-        result = await awaitable
-        return result['StatusCode']
+                                                        /data/plaso/storage.plaso"
+    else:
+        raise Exception("Unknown command type")
+
+    container = docker.from_env().containers.run(api_settings.PLASO_CONTAINER_NAME,
+                                                 command_string,
+                                                 auto_remove=True,
+                                                 detach=True,
+                                                 name=command + "_" + evidence_name,
+                                                 volumes={evidence_path:
+                                                              {'bind': '/data', 'mode': 'rw'},
+                                                          }
+                                                 )
+    result = container.wait()
+    return result
+
+
+def run_log2timeline(evidence_name):
+    try:
+        result = run_docker_container("log2timeline", evidence_name)
+    except APIError as api_error:
+        pass
+    except ContainerError as cont_error:
+        pass
+    except ImageNotFound as img_error:
+        pass
+    except Exception as ex:
+        pass
+
+
+def run_pinfo(evidence_name):
+    try:
+        result = run_docker_container("pinfo", evidence_name)
+    except APIError as api_error:
+        pass
+    except ContainerError as cont_error:
+        pass
+    except ImageNotFound as img_error:
+        pass
+    except Exception as ex:
+        pass
+
+
+def run_psort(evidence_name):
+    try:
+        result = run_docker_container("psort", evidence_name)
+        return result["StatusCode"]
+    except APIError as api_error:
+        pass
+    except ContainerError as cont_error:
+        pass
+    except ImageNotFound as img_error:
+        pass
+    except Exception as ex:
+        pass

@@ -7,7 +7,7 @@ from django.db import models
 
 def media_file_name(instance, filename):
     h = instance.hashsum
-    return os.path.join(f'{h}/evidences/{filename}')
+    return os.path.join(f'{h}/evidence/{filename}')
 
 
 class UploadData(models.Model):

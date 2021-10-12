@@ -4,6 +4,6 @@ $(document).ready(function () {
         $('#status_').load(' #status_', function () {
             $(this).children().unwrap()
         })
-    }, 2000);
+    }, 3000);
 });
 

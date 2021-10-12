@@ -5,3 +5,5 @@ uploads
 __pycache__/
 db.sqlite3
 */migrations/*
+celerybeat-schedule
+dump.rdb

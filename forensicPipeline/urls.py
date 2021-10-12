@@ -28,6 +28,7 @@ urlpatterns = [
     path('removeAll', uploader_views.remove_all),
     path('analyzeSingleId=<int:id>', processor_views.analyze_one, name="id"),
     path('analyzeAll', processor_views.analyze_all),
+    path('showLogsOf=<int:id>Type=<str:type>',processor_views.show_logs),
     path('admin/', admin.site.urls)
 ]
 
