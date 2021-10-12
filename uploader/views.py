@@ -6,6 +6,8 @@ import shutil
 from datetime import datetime
 
 from django.core.files.storage import default_storage
+from django.core.management import call_command
+from django.db.models import FileField
 from django.shortcuts import render, redirect
 
 from plaso_api.DockerHandler import DockerHandler
@@ -46,34 +48,21 @@ def calculate_hash(file):
 def save_file(request):
     if request.method == 'POST':
         for file in request.FILES.values():
-            file_hash = calculate_hash(file)
-            if not os.path.isdir(f"uploads/{file_hash}"):
-                os.makedirs(f"uploads/{file_hash}/evidences")
-                default_storage.save(f"{file_hash}/evidences/{file.name}", file)
-                UploadData.objects.create(hashsum=file_hash, status="ready", name=file.name, size=sizeof_fmt(file.size))
-            else:
-                UploadData.objects.filter(hashsum=file_hash).update(added=datetime.now())
-            UploadData.objects.filter(hashsum=file_hash).update(status="success_data_upload")
+            upload_data = UploadData(status="ready", name=file.name, size=sizeof_fmt(file.size), file_path=file)
+            upload_data.save()
     return redirect('/')
 
 
 def remove_one(request, id):
     file_object = UploadData.objects.get(id=id)
     file_object.delete()
-    # TODO: Work with file fields here !! A base command or signals https://www.algotech.solutions/blog/python/deleting-unused-django-media-files/
-    for dir in glob.glob(f"uploads/{file_object.hashsum}/*"):
-        shutil.rmtree(dir)
-    default_storage.delete(f"{file_object.hashsum}")
+    call_command('cleanup')
     return redirect('/')
 
 
 def remove_all(request):
-    files = UploadData.objects.order_by('added')
-    for file_object in files:
-        for dir in glob.glob(f"uploads/{file_object.hashsum}/*"):
-            shutil.rmtree(dir)
-        default_storage.delete(f"{file_object.hashsum}")
-        file_object.delete()
+    UploadData.objects.all().delete()
+    call_command('cleanup')
     return redirect('/')
 
 

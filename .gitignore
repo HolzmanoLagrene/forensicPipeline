@@ -3,3 +3,5 @@ plaso
 uploads
 .idea/
 __pycache__/
+db.sqlite3
+*/migrations/*
