@@ -39,7 +39,7 @@
                             {% for file in files.all %}
                                 <tr>
                                     <td>{{ file.name }}</td>
-                                    <td>{{ file.added }}</td>
+                                    <td>{{ file.added|date:'d. F Y H:i:s' }}</td>
                                     <td >{{ file.size }}</td>
                                     <td id="status_">{% include "uploader/status.html" %}</td>
                                     <td>
