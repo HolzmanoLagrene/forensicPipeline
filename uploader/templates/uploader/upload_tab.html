@@ -41,7 +41,7 @@
                                     <td>{{ file.name }}</td>
                                     <td>{{ file.added|date:'d. F Y H:i:s' }}</td>
                                     <td >{{ file.size }}</td>
-                                    <td id="status_">{% include "uploader/status.html" %}</td>
+                                    <td id="status_{{ file.id }}">{% include "uploader/status.html" %}</td>
                                     <td>
                                         <form action='analyzeSingleId={{ file.id }}'
                                               method='GET'>
