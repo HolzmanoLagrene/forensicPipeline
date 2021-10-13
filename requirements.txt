@@ -3,3 +3,4 @@ numpy
 docker
 celery
 redis
+json2html

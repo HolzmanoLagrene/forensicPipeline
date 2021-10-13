@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{% static 'uploader/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'uploader/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'uploader/css/bootstrap-table.min.css' %}">
+
+    <title>{{ title }}</title>
+</head>
+<body>
+<div class="tab-pane fade show active" id="tabone" role="tabpanel">
+    <div class="container-fluid">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <div id="file_list" class="js-upload-finished">
+                    <h3>{{ title }}</h3>
+                    <div class="list-group">
+                        {{ html|safe }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="{% static 'uploader/js/bootstrap.min.js' %}"></script>
+<script src="{% static 'uploader/js/bootstrap-table.min.js' %}"></script>
+<script src="{% static 'uploader/js/bootstrap-table-auto-refresh.min.js' %}"></script>
+
+</body>
+</html>

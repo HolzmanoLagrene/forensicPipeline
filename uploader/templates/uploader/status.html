@@ -6,43 +6,85 @@
     <img class="rotate" src="{% static 'uploader/widgets/activity.svg' %}"/>
 {% elif file.status == "success_log2timeline" %}
     <img src="{% static 'uploader/widgets/file_upload_success.svg' %}"/>
-    <img src="{% static 'uploader/widgets/activity_success.svg' %}"/>
+    <a style="line-height: 1;" href="/showLogs" target="popup"
+       onclick="window.open('/showLogsOf={{ file.id }}Type=log2timeline','popup','width=600,height=600'); return false;">
+        <img src="{% static 'uploader/widgets/activity_success.svg' %}"/>
+    </a>
 {% elif file.status == "failed_log2timeline" %}
     <img src="{% static 'uploader/widgets/file_upload_success.svg' %}"/>
-    <img src="{% static 'uploader/widgets/activity_failed.svg' %}"/>
+    <a style="line-height: 1;" href="/showLogs" target="popup"
+       onclick="window.open('/showLogsOf={{ file.id }}Type=log2timeline','popup','width=600,height=600'); return false;">
+        <img src="{% static 'uploader/widgets/activity_failed.svg' %}"/>
+    </a>
 {% elif file.status == "processing_pinfo" %}
     <img src="{% static 'uploader/widgets/file_upload_success.svg' %}"/>
-    <img src="{% static 'uploader/widgets/activity_success.svg' %}"/>
+    <a style="line-height: 1;" href="/showLogs" target="popup"
+       onclick="window.open('/showLogsOf={{ file.id }}Type=log2timeline','popup','width=600,height=600'); return false;">
+        <img src="{% static 'uploader/widgets/activity_success.svg' %}"/>
+    </a>
     <img class="rotate" src="{% static 'uploader/widgets/info.svg' %}"/>
 {% elif file.status == "success_pinfo" %}
     <img src="{% static 'uploader/widgets/file_upload_success.svg' %}"/>
-    <img src="{% static 'uploader/widgets/activity_success.svg' %}"/>
-    <img src="{% static 'uploader/widgets/information_available.svg' %}"/>
+    <a style="line-height: 1;" href="/showLogs" target="popup"
+       onclick="window.open('/showLogsOf={{ file.id }}Type=log2timeline','popup','width=600,height=600'); return false;">
+        <img src="{% static 'uploader/widgets/activity_success.svg' %}"/>
+    </a>
+    <a style="line-height: 1;" href="/showLogs" target="popup"
+       onclick="window.open('/showLogsOf={{ file.id }}Type=pinfo','popup','width=600,height=600'); return false;">
+        <img src="{% static 'uploader/widgets/information_available.svg' %}"/>
+    </a>
 {% elif file.status == "failed_pinfo" %}
     <img src="{% static 'uploader/widgets/file_upload_success.svg' %}"/>
-    <img src="{% static 'uploader/widgets/activity_success.svg' %}"/>
-    <img src="{% static 'uploader/widgets/information_failed.svg' %}"/>
+    <a style="line-height: 1;" href="/showLogs" target="popup"
+       onclick="window.open('/showLogsOf={{ file.id }}Type=log2timeline','popup','width=600,height=600'); return false;">
+        <img src="{% static 'uploader/widgets/activity_success.svg' %}"/>
+    </a>
+    <a style="line-height: 1;" href="/showLogs" target="popup"
+       onclick="window.open('/showLogsOf={{ file.id }}Type=pinfo','popup','width=600,height=600'); return false;">
+        <img src="{% static 'uploader/widgets/information_failed.svg' %}"/>
+    </a>
 {% elif file.status == "processing_psort" %}
     <img src="{% static 'uploader/widgets/file_upload_success.svg' %}"/>
-    <img src="{% static 'uploader/widgets/activity_success.svg' %}"/>
-    <img src="{% static 'uploader/widgets/information_available.svg' %}"/>
+    <a style="line-height: 1;" href="/showLogs" target="popup"
+       onclick="window.open('/showLogsOf={{ file.id }}Type=log2timeline','popup','width=600,height=600'); return false;">
+        <img src="{% static 'uploader/widgets/activity_success.svg' %}"/>
+    </a>
+    <a style="line-height: 1;" href="/showLogs" target="popup"
+       onclick="window.open('/showLogsOf={{ file.id }}Type=pinfo','popup','width=600,height=600'); return false;">
+        <img src="{% static 'uploader/widgets/information_available.svg' %}"/>
+    </a>
     <img class="rotate" src="{% static 'uploader/widgets/upload.svg' %}"/>
 {% elif file.status == "success_psort" %}
+    <img src="{% static 'uploader/widgets/file_upload_success.svg' %}"/>
     <a style="line-height: 1;" href="/showLogs" target="popup"
-       onclick="window.open('/showLogsOf={{ file.id }}Type=upload','popup','width=600,height=600'); return false;">
-        <img src="{% static 'uploader/widgets/file_upload_success.svg' %}"/>
+       onclick="window.open('/showLogsOf={{ file.id }}Type=log2timeline','popup','width=600,height=600'); return false;">
+        <img src="{% static 'uploader/widgets/activity_success.svg' %}"/>
     </a>
-    <img src="{% static 'uploader/widgets/activity_success.svg' %}"/>
-    <img src="{% static 'uploader/widgets/information_available.svg' %}"/>
-    <img src="{% static 'uploader/widgets/upload_success.svg' %}"/>
+    <a style="line-height: 1;" href="/showLogs" target="popup"
+       onclick="window.open('/showLogsOf={{ file.id }}Type=pinfo','popup','width=600,height=600'); return false;">
+        <img src="{% static 'uploader/widgets/information_available.svg' %}"/>
+    </a>
+    <a style="line-height: 1;" href="/showLogs" target="popup"
+       onclick="window.open('/showLogsOf={{ file.id }}Type=psort','popup','width=600,height=600'); return false;">
+        <img src="{% static 'uploader/widgets/upload_success.svg' %}"/>
+    </a>
     <a style="line-height: 1;" href="/openNotebook" target="_blank">
         <img src="{% static 'uploader/widgets/book-open.svg' %}"/>
     </a>
 {% elif file.status == "failed_psort" %}
     <img src="{% static 'uploader/widgets/file_upload_success.svg' %}"/>
-    <img src="{% static 'uploader/widgets/activity_success.svg' %}"/>
-    <img src="{% static 'uploader/widgets/information_available.svg' %}"/>
-    <img src="{% static 'uploader/widgets/upload_failed.svg' %}"/>
+    <a style="line-height: 1;" href="/showLogs" target="popup"
+       onclick="window.open('/showLogsOf={{ file.id }}Type=log2timeline','popup','width=600,height=600'); return false;">
+        <img src="{% static 'uploader/widgets/activity_success.svg' %}"/>
+    </a>
+    <a style="line-height: 1;" href="/showLogs" target="popup"
+       onclick="window.open('/showLogsOf={{ file.id }}Type=pinfo','popup','width=600,height=600'); return false;">
+        <img src="{% static 'uploader/widgets/information_available.svg' %}"/>
+    </a>
+    <a style="line-height: 1;" href="/showLogs" target="popup"
+       onclick="window.open('/showLogsOf={{ file.id }}Type=psort','popup','width=600,height=600'); return false;">
+        <img src="{% static 'uploader/widgets/upload_failed.svg' %}"/>
+    </a>
 {% elif file.status == "error" %}
     <img src="{% static 'uploader/widgets/alert-triangle.svg' %}"/>
 {% endif %}

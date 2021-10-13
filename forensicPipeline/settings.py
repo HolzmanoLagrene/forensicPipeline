@@ -31,6 +31,7 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'uploader.apps.UploaderConfig',
     'processor.apps.ProcessorConfig',
+    'logviewer.apps.LogviewerConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
