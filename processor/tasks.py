@@ -14,6 +14,7 @@ def run_log2timeline_background(id):
     if status_code == 0:
         UploadData.objects.filter(hashsum=id).update(status="success_log2timeline")
     else:
+        logger.info(status_code)
         UploadData.objects.filter(hashsum=id).update(status="failed_log2timeline")
 
 
@@ -30,6 +31,7 @@ def run_pinfo_background(id):
     if status_code == 0:
         UploadData.objects.filter(hashsum=id).update(status="success_pinfo")
     else:
+        logger.info(status_code)
         UploadData.objects.filter(hashsum=id).update(status="failed_pinfo")
 
 
@@ -40,4 +42,5 @@ def run_psort_background(id):
     if status_code == 0:
         UploadData.objects.filter(hashsum=id).update(status="success_psort")
     else:
+        logger.info(status_code)
         UploadData.objects.filter(hashsum=id).update(status="failed_psort")

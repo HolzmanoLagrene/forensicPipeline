@@ -72,6 +72,7 @@ def run_docker_container(command, evidence_name):
                                                  command_string,
                                                  auto_remove=True,
                                                  detach=True,
+                                                 network_mode="host",
                                                  name=command + "_" + evidence_name,
                                                  volumes={evidence_path:
                                                               {'bind': '/data', 'mode': 'rw'},
@@ -85,26 +86,26 @@ def run_log2timeline(evidence_name):
     try:
         result = run_docker_container("log2timeline", evidence_name)
     except APIError as api_error:
-        pass
+        return -99
     except ContainerError as cont_error:
-        pass
+        return -99
     except ImageNotFound as img_error:
-        pass
+        return -99
     except Exception as ex:
-        pass
+        return -99
 
 
 def run_pinfo(evidence_name):
     try:
         result = run_docker_container("pinfo", evidence_name)
     except APIError as api_error:
-        pass
+        return -99
     except ContainerError as cont_error:
-        pass
+        return -99
     except ImageNotFound as img_error:
-        pass
+        return -99
     except Exception as ex:
-        pass
+        return -99
 
 
 def run_psort(evidence_name):
@@ -112,10 +113,10 @@ def run_psort(evidence_name):
         result = run_docker_container("psort", evidence_name)
         return result["StatusCode"]
     except APIError as api_error:
-        pass
+        return -99
     except ContainerError as cont_error:
-        pass
+        return -99
     except ImageNotFound as img_error:
-        pass
+        return -99
     except Exception as ex:
-        pass
+        return -99
