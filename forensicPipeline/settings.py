@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     'uploader.apps.UploaderConfig',
     'processor.apps.ProcessorConfig',
     'logviewer.apps.LogviewerConfig',
+    'notebook.apps.NotebookConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

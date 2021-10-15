@@ -1,4 +1,5 @@
 import os
+import shutil
 
 import docker
 from docker.errors import APIError, ContainerError, ImageNotFound
@@ -82,9 +83,40 @@ def run_docker_container(command, evidence_name):
     return result
 
 
+def prepare_jupyter_notebook(evidence_name):
+    notebook_path = os.path.join(api_settings.NOTEBOOK_PATH, evidence_name)
+    default_notebook_path = os.path.join(api_settings.NOTEBOOK_PATH,"default","default.ipynb")
+    shutil.copy(default_notebook_path,notebook_path)
+
+def run_jupyter_notebook(evidence_name):
+    notebook_path = os.path.join(api_settings.NOTEBOOK_PATH, evidence_name)
+    prepare_jupyter_notebook(evidence_name)
+    command_string = f"jupyter lab --ip='*'\
+                        --port=8888\
+                         --no-browser\
+                          --NotebookApp.token=''\
+                           --allow-root\
+                            --notebook-dir=/notebooks"
+    container = docker.from_env().containers.run(api_settings.NOTEBOOK_CONTAINER_NAME,
+                                                 command_string,
+                                                 auto_remove=True,
+                                                 detach=True,
+                                                 ports={8888: 8888},
+                                                 name="jupyterlab_" + evidence_name,
+                                                 volumes={notebook_path:
+                                                              {'bind': '/notebooks', 'mode': 'rw'},
+                                                          api_settings.SNIPPETS_PATH:
+                                                              {'bind': '/home/jovyan/.jupyter/lab/user-settings/jupyterlab-code-snippets/', 'mode': 'rw'}
+                                                          }
+                                                 )
+    result = container.wait()
+    return result
+
+
 def run_log2timeline(evidence_name):
     try:
         result = run_docker_container("log2timeline", evidence_name)
+        return result["StatusCode"]
     except APIError as api_error:
         return -99
     except ContainerError as cont_error:
@@ -98,6 +130,7 @@ def run_log2timeline(evidence_name):
 def run_pinfo(evidence_name):
     try:
         result = run_docker_container("pinfo", evidence_name)
+        return result["StatusCode"]
     except APIError as api_error:
         return -99
     except ContainerError as cont_error:

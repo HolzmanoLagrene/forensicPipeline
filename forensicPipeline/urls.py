@@ -18,9 +18,10 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path
 
+from logviewer import views as logviewer_views
+from notebook import views as notebook_views
 from processor import views as processor_views
 from uploader import views as uploader_views
-from logviewer import views as logviewer_views
 
 urlpatterns = [
     path('', uploader_views.upload_page, name=""),
@@ -29,7 +30,8 @@ urlpatterns = [
     path('removeAll', uploader_views.remove_all),
     path('analyzeSingleId=<int:id>', processor_views.analyze_one, name="id"),
     path('analyzeAll', processor_views.analyze_all),
-    path('showLogsOf=<int:id>Type=<str:type>',logviewer_views.show_logs),
+    path('showLogsOf=<int:id>Type=<str:type>', logviewer_views.show_logs),
+    path('openNotebook=<int:id>', notebook_views.open_notebook),
     path('admin/', admin.site.urls)
 ]
 

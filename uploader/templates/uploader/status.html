@@ -68,7 +68,7 @@
        onclick="window.open('/showLogsOf={{ file.id }}Type=psort','popup','width=600,height=600'); return false;">
         <img src="{% static 'uploader/widgets/upload_success.svg' %}"/>
     </a>
-    <a style="line-height: 1;" href="/openNotebook" target="_blank">
+    <a style="line-height: 1;" href="/openNotebook={{ file.id }}" target="_blank">
         <img src="{% static 'uploader/widgets/book-open.svg' %}"/>
     </a>
 {% elif file.status == "failed_psort" %}

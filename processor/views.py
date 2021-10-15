@@ -1,7 +1,6 @@
 from celery import chain
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect
 
-from plaso_api import DockerHandler
 from processor.tasks import *
 
 

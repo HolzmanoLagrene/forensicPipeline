@@ -1,11 +1,18 @@
 {
+    // Code Snippet Manager
+    // jupyterlab-code-snippets:snippets
+    // Code Snippet Manager Settings
+    // *********************************
+
+    // Code Snippets
+    // The list of snippets.
     "snippets": [
         {
             "name": "Plotting_sine",
             "description": "Plotting code for sine graph using matplotlib.",
             "language": "Python",
             "code": [
-                "import matplotlib.pyplot as plt",
+                "import pandas as pd",
                 "import numpy as np",
                 "",
                 "x = np.linspace(0, 10, 100)",
@@ -20,32 +27,12 @@
                 "plot"
             ]
         },
-      {
-            "name": "Plotting_sine",
+        {
+            "name": "TestSnippet",
             "description": "Plotting code for sine graph using matplotlib.",
             "language": "Python",
             "code": [
-                "import matplotlib.pyplot as plt",
-                "import numpy as np",
-                "",
-                "x = np.linspace(0, 10, 100)",
-                "",
-                "plt.plot(x, np.sin(x))",
-                "plt.plot(x, np.cos(x))",
-                "",
-                "plt.show()"
-            ],
-            "id": 0,
-            "tags": [
-                "plot"
-            ]
-        },
-      {
-            "name": "Plotting_sine",
-            "description": "Plotting code for sine graph using matplotlib.",
-            "language": "Python",
-            "code": [
-                "import matplotlib.pyplot as plt",
+                "import pandas as pd",
                 "import numpy as np",
                 "",
                 "x = np.linspace(0, 10, 100)",
@@ -90,6 +77,16 @@
             "tags": [
                 "machine learning"
             ]
+        },
+        {
+            "name": "Test Snippet 2",
+            "description": "",
+            "language": "Python",
+            "code": [
+                "import pandas as pd"
+            ],
+            "id": 4,
+            "tags": []
         }
     ]
 }
