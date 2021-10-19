@@ -1,20 +1,32 @@
 #!/bin/bash
-if [[ -z "$VIRTUAL_ENV" ]]; then
-    echo "Please use a virtual environment or else your system is going to be messed up..."
-    exit
-fi
-if [[ $(basename $PWD) != "setup" ]]; then
-    echo "Please start this script from within setup folder"
-    exit
-fi
+#
+# Since Docker run can only have one "entry point" this script enables calling
+# either log2timeline or other utility scripts e.g.
+# docker run <container_id> image_export
+# docker run <container_id> log2timeline
+# docker run <container_id> pinfo
+# docker run <container_id> psort
+# docker run <container_id> psteal
+#
+# or to run it on actual data:
+# mkdir -p /data/sources    # put the files to parse here
+# mkdir -p /data/results    # a Plaso storage file will appear here
+# docker run -v /data/:/data <container_id> log2timeline \
+#     /data/results/result.plaso /data/sources
 
-echo "--------------------------- Cloning Plaso ---------------------------"
-git clone https://github.com/log2timeline/plaso.git ../plaso
-pip install --upgrade pip
-pip install -r ../requirements.txt
-cp DO_NOT_TOUCH_plaso-switch_improved.sh ../plaso/config/docker/plaso-switch.sh
-echo "--------------------------- Building Docker Container for Plaso ---------------------------"
-sudo docker build -t plaso:latest ../plaso/config/docker/
-echo "--------------------------- Building Docker Container for Python Notebook ---------------------------"
-sudo docker build  -t notebook:latest .
-rm -rf ../plaso
+case "$1" in
+  image_export|image_export.py)
+    /usr/bin/image_export.py --unattended "${@:2}" ;;
+  log2timeline|log2timeline.py)
+    /usr/bin/log2timeline.py --unattended --process_archives --partitions all --vss_stores all "${@:2}" ;;
+  pinfo|pinfo.py)
+    /usr/bin/pinfo.py "${@:2}" ;;
+  psort|psort.py)
+    /usr/bin/psort.py --unattended "${@:2}" ;;
+  psteal|psteal.py)
+    /usr/bin/psteal.py --unattended "${@:2}" ;;
+  "")
+    /usr/bin/log2timeline.py --unattended "${@:2}" ;;
+  *)
+    echo "Unsupported command: $1"
+esac
