@@ -4,3 +4,4 @@ docker
 celery
 redis
 json2html
+django

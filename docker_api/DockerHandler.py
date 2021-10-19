@@ -4,7 +4,7 @@ import shutil
 import docker
 from docker.errors import APIError, ContainerError, ImageNotFound
 
-from plaso_api import api_settings
+from docker_api import api_settings
 
 
 def __fix_folder_configuration(evidence_path):

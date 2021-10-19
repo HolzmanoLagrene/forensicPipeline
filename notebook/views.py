@@ -3,7 +3,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
 
 from notebook.tasks import run_notebook_background
-from plaso_api import DockerHandler
+from docker_api import DockerHandler
 from uploader.models import UploadData
 
 

@@ -5,7 +5,7 @@ DATA_PATH = os.path.join(BASE_PATH, "uploads")
 NOTEBOOK_PATH = os.path.join(BASE_PATH, "jupyterlab", "notebooks")
 SNIPPETS_PATH = os.path.join(BASE_PATH, "jupyterlab", "snippets")
 PLASO_CONTAINER_NAME = "plaso:latest"
-NOTEBOOK_CONTAINER_NAME = "notebook_experiment"
+NOTEBOOK_CONTAINER_NAME = "notebook:latest"
 
 elasticsearch_server = "localhost"
 elasticsearch_port = 9200

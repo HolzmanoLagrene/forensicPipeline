@@ -1,7 +1,7 @@
 from celery.utils.log import get_task_logger
 
 from forensicPipeline.celery import app
-from plaso_api.DockerHandler import *
+from docker_api.DockerHandler import *
 from uploader.models import UploadData
 
 logger = get_task_logger(__name__)
