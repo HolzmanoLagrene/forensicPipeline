@@ -133,3 +133,9 @@ CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'Europe/Berlin'
+
+# You can override the default settings by creating a local_settings.py file
+try:
+    from forensicPipeline.local_settings import *
+except ImportError:
+    print('could not load local_settings.py')

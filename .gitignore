@@ -7,3 +7,4 @@ db.sqlite3
 celerybeat-schedule
 dump.rdb
 jupyterlab/notebooks
+local_settings.py
