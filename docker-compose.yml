@@ -25,6 +25,18 @@ services:
     depends_on:
       - redis
 
+  web:
+    build: .
+    environment:
+      - BROKER_URL=redis://redis:6379
+      - CELERY_RESULT_BACKEND=redis://redis:6379
+    command: python manage.py runserver 0.0.0.0:8080
+    volumes:
+      - .:/code
+    ports:
+      - "8080:8080"
+
+
 volumes:
   redis_data:
     driver: local
