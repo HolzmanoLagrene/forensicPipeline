@@ -18,7 +18,7 @@ case "$1" in
   image_export|image_export.py)
     /usr/bin/image_export.py --unattended "${@:2}" ;;
   log2timeline|log2timeline.py)
-    /usr/bin/log2timeline.py --unattended --process_archives --partitions all --vss_stores all "${@:2}" ;;
+    /usr/bin/log2timeline.py --unattended --partitions all --vss_stores all "${@:2}" ;;
   pinfo|pinfo.py)
     /usr/bin/pinfo.py "${@:2}" ;;
   psort|psort.py)
