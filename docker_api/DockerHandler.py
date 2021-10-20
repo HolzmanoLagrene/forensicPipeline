@@ -2,12 +2,12 @@ import os
 import shutil
 
 import docker
-from docker.errors import APIError, ContainerError, ImageNotFound
+from django.conf import settings
 
 from docker_api import api_settings
 
 
-def __fix_folder_configuration(evidence_path):
+def __prepare_case_folders__(evidence_path):
     if not os.path.isdir(os.path.join(evidence_path, "plaso")):
         os.makedirs(os.path.join(evidence_path, "plaso"))
     else:
@@ -19,7 +19,7 @@ def __fix_folder_configuration(evidence_path):
 
 
 def __print_logs(container, evidence_name, type, verbose):
-    evidence_path = os.path.join(api_settings.DATA_PATH, evidence_name, "logs")
+    evidence_path = os.path.join(settings.EVIDENCE_DIR, evidence_name, "logs")
     log_path = os.path.join(evidence_path, f"{type}_plaso_logs.log")
     logs = container.logs(stream=True, follow=True)
     try:
@@ -40,53 +40,68 @@ def stop_process(evidence_name):
 
 
 def run_docker_container(command, evidence_name):
-    evidence_path = os.path.join(api_settings.DATA_PATH, evidence_name)
+    worker_case_path = os.path.join(settings.EVIDENCE_DIR, evidence_name)
+    docker_case_path = os.path.join(settings.DOCKER_EVIDENCE_DIR, evidence_name)
+
     if command == "log2timeline":
-        __fix_folder_configuration(evidence_path)
-        command_string = "log2timeline \
-                                     --storage_file /data/plaso/storage.plaso\
-                                     --logfile /data/logs/log2timeline.log \
+        __prepare_case_folders__(worker_case_path)
+        command_string = f"log2timeline \
+                                     --storage_file {docker_case_path}/plaso/storage.plaso\
+                                     --logfile {docker_case_path}/logs/log2timeline.log \
                                       --status_view linear\
-                                      -d \
-                                      /data/evidence"
+                                      -d\
+                                      {docker_case_path}/evidence"
     elif command == "pinfo":
-        command_string = "pinfo \
-                                                          -w /data/plaso/pinfo.json \
+        command_string = f"pinfo \
+                                                          -w {docker_case_path}/plaso/pinfo.json \
                                                           -v \
                                                           --output_format json \
-                                                          /data/plaso/storage.plaso"
+                                                          {docker_case_path}/plaso/storage.plaso"
     elif command == "psort":
         command_string = f"psort \
                                                         -d \
-                                                --logfile /data/logs/psort.log \
+                                                --logfile {docker_case_path}/logs/psort.log \
                                                 -o elastic \
                                                 --status_view linear\
                                                 --elastic_mappings /usr/share/plaso/elasticsearch.mappings\
-                                                --server {api_settings.elasticsearch_server}\
-                                                --port {api_settings.elasticsearch_port}\
+                                                --server {settings.ELASTIC_HOST}\
+                                                --port {settings.ELASTIC_PORT}\
                                                 --index_name plaso_{evidence_name}\
-                                                        /data/plaso/storage.plaso"
+                                                        {docker_case_path}/plaso/storage.plaso"
     else:
         raise Exception("Unknown command type")
 
-    container = docker.from_env().containers.run(api_settings.PLASO_CONTAINER_NAME,
+    container = docker.from_env().containers.run(settings.DOCKER_PLASO_CONTAINER_NAME,
                                                  command_string,
-                                                 auto_remove=True,
+                                                 auto_remove=False,
                                                  detach=True,
                                                  network_mode="host",
                                                  name=command + "_" + evidence_name,
-                                                 volumes={evidence_path:
-                                                              {'bind': '/data', 'mode': 'rw'},
+                                                 volumes={settings.DOCKER_VOLUME_EVIDENCE:
+                                                              {'bind': settings.DOCKER_EVIDENCE_DIR, 'mode': 'rw'},
                                                           }
                                                  )
+
+    print(f'Starting container {container.name} (ID: {container.id})', end='')
+    print(f'Celery worker case path: {worker_case_path}', end='')
+    print(f'Docker case path: {docker_case_path}', end='')
+
+    print(f'Waiting for {container.name} to finish', end='')
     result = container.wait()
+
+    print(f'{container.name} logs: {container.logs()}')
+
+    print(f'Removing {container.name}', end='')
+    container.remove()
+
     return result
 
 
 def prepare_jupyter_notebook(evidence_name):
     notebook_path = os.path.join(api_settings.NOTEBOOK_PATH, evidence_name)
-    default_notebook_path = os.path.join(api_settings.NOTEBOOK_PATH,"default","default.ipynb")
-    shutil.copy(default_notebook_path,notebook_path)
+    default_notebook_path = os.path.join(api_settings.NOTEBOOK_PATH, "default", "default.ipynb")
+    shutil.copy(default_notebook_path, notebook_path)
+
 
 def run_jupyter_notebook(evidence_name):
     notebook_path = os.path.join(api_settings.NOTEBOOK_PATH, evidence_name)
@@ -97,7 +112,7 @@ def run_jupyter_notebook(evidence_name):
                           --NotebookApp.token=''\
                            --allow-root\
                             --notebook-dir=/notebooks"
-    container = docker.from_env().containers.run(api_settings.NOTEBOOK_CONTAINER_NAME,
+    container = docker.from_env().containers.run(settings.DOCKER_NOTEBOOK_CONTAINER_NAME,
                                                  command_string,
                                                  auto_remove=True,
                                                  detach=True,
@@ -106,7 +121,9 @@ def run_jupyter_notebook(evidence_name):
                                                  volumes={notebook_path:
                                                               {'bind': '/notebooks', 'mode': 'rw'},
                                                           api_settings.SNIPPETS_PATH:
-                                                              {'bind': '/home/jovyan/.jupyter/lab/user-settings/jupyterlab-code-snippets/', 'mode': 'rw'}
+                                                              {
+                                                                  'bind': '/home/jovyan/.jupyter/lab/user-settings/jupyterlab-code-snippets/',
+                                                                  'mode': 'rw'}
                                                           }
                                                  )
     result = container.wait()
@@ -117,13 +134,9 @@ def run_log2timeline(evidence_name):
     try:
         result = run_docker_container("log2timeline", evidence_name)
         return result["StatusCode"]
-    except APIError as api_error:
-        return -99
-    except ContainerError as cont_error:
-        return -99
-    except ImageNotFound as img_error:
-        return -99
+
     except Exception as ex:
+        print(f'Exception: {ex}')
         return -99
 
 
@@ -131,13 +144,9 @@ def run_pinfo(evidence_name):
     try:
         result = run_docker_container("pinfo", evidence_name)
         return result["StatusCode"]
-    except APIError as api_error:
-        return -99
-    except ContainerError as cont_error:
-        return -99
-    except ImageNotFound as img_error:
-        return -99
+
     except Exception as ex:
+        print(f'Exception: {ex}')
         return -99
 
 
@@ -145,11 +154,7 @@ def run_psort(evidence_name):
     try:
         result = run_docker_container("psort", evidence_name)
         return result["StatusCode"]
-    except APIError as api_error:
-        return -99
-    except ContainerError as cont_error:
-        return -99
-    except ImageNotFound as img_error:
-        return -99
+
     except Exception as ex:
+        print(f'Exception: {ex}')
         return -99

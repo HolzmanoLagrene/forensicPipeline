@@ -125,14 +125,25 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 MEDIA_URL = "/uploads/"
 MEDIA_ROOT = os.path.join(BASE_DIR, 'uploads')
+EVIDENCE_DIR = MEDIA_ROOT
 
 # CELERY
-BROKER_URL = 'redis://localhost:6379'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379'
+BROKER_URL = os.getenv('BROKER_URL', 'redis://localhost:6379')
+CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND', 'redis://localhost:6379')
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'Europe/Berlin'
+
+# Docker
+DOCKER_EVIDENCE_DIR = '/data'
+DOCKER_VOLUME_EVIDENCE = os.getenv('EVIDENCE_VOLUME', os.path.join(BASE_DIR, "uploads"))
+DOCKER_PLASO_CONTAINER_NAME = 'plaso:latest'
+DOCKER_NOTEBOOK_CONTAINER_NAME = 'notebook:latest'
+
+# Elasticsearch
+ELASTIC_HOST = os.getenv('ELASTIC_HOST', 'localhost')
+ELASTIC_PORT = os.getenv('ELASTIC_PORT', '9200')
 
 # You can override the default settings by creating a local_settings.py file
 try:

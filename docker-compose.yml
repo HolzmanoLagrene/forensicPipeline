@@ -1,0 +1,37 @@
+version: '3.2'
+
+services:
+  redis:
+    image: docker.io/bitnami/redis:6.2
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+      - REDIS_DISABLE_COMMANDS=FLUSHDB,FLUSHALL
+    ports:
+      - '6379:6379'
+    volumes:
+      - 'redis_data:/bitnami/redis/data'
+
+  celery_worker:
+    build: .
+    environment:
+      - EVIDENCE_VOLUME=forensicpipeline_evidence_data
+      - BROKER_URL=redis://redis:6379
+      - CELERY_RESULT_BACKEND=redis://redis:6379
+    volumes:
+      - .:/code
+      - evidence_data:/data
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: [ 'celery', '-A', 'forensicPipeline.celery', 'worker', '-l', 'info' ]
+    depends_on:
+      - redis
+
+volumes:
+  redis_data:
+    driver: local
+
+  evidence_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: $PWD/uploads
